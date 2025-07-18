@@ -43,3 +43,54 @@ export const renterSignupMessage = `
   </div>
 `;
 
+export const approvedMessage = (title, name) => {
+  return `<div style="font-family: Arial, sans-serif; padding: 24px; background-color: #f4f6f8; color: #333; border-radius: 12px; max-width: 600px; margin: 40px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+  
+  <h1 style="text-align: center; color: #e67e22; margin-bottom: 24px; font-size: 28px;">
+    🏠 MeFieConnect
+  </h1>
+  
+  <h2 style="margin-top: 0; color: #2c3e50; font-size: 20px;">Hi ${name},</h2>
+  
+  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+    We're excited to let you know that your listing <strong>${title}</strong> has been <strong>approved</strong> and is now <strong>live</strong> on our platform!
+  </p>
+  
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="#" style="background-color: #e67e22; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 16px;">
+      View Your Listing
+    </a>
+  </div>
+</div>
+`;
+} ;
+
+export const rejectedMessage = (title, name) => {
+  return `<div style="font-family: Arial, sans-serif; padding: 24px; background-color: #fff6f6; color: #333; border-radius: 12px; max-width: 600px; margin: 40px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+  
+  <h1 style="text-align: center; color: #e74c3c; margin-bottom: 24px; font-size: 28px;">
+    ❗ MeFieConnect
+  </h1>
+  
+  <h2 style="margin-top: 0; color: #2c3e50; font-size: 20px;">Hi ${name},</h2>
+  
+  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">
+    Thank you for submitting your listing <strong>${title}</strong> to MeFieConnect.
+  </p>
+  
+  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+    Unfortunately, your listing was <strong>not approved</strong> at this time. This may be due to incomplete details, non-compliance with our listing guidelines, or other verification issues.
+  </p>
+  
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="#" style="background-color: #e74c3c; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 16px;">
+      Review and Edit Listing
+    </a>
+  </div>
+  
+  <p style="font-size: 14px; color: #777; margin-top: 30px; text-align: center;">
+    Need help? Contact support at <a href="mailto:support@mefieconnect.com">support@mefieconnect.com</a>
+  </p>
+</div>
+`;
+} 

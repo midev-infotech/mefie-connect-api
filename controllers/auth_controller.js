@@ -7,10 +7,10 @@ import { Renter } from "../models/renter_model.js";
 import { landlordSignupMessage, renterSignupMessage } from "../utils/email_html.js";
 
 export const signupLandlord = async (req, res) => {
-    const { firstName, lastName, email, password, confirmPassword, phoneNumber } = req.body;
+    const { firstName, lastName, email, password, confirmPassword, phoneNumber, role } = req.body;
 
     try {
-        const { error, value } = landlordSchema.validate({ firstName, lastName, email, password, confirmPassword, phoneNumber });
+        const { error, value } = landlordSchema.validate({ firstName, lastName, email, password, confirmPassword, phoneNumber, role });
 
         if (error) {
             return res.status(401).json({ success: false, message: error.details[0].message });
@@ -32,7 +32,7 @@ export const signupLandlord = async (req, res) => {
         let info = await transport.sendMail({
             from: process.env.SENDER_EMAIL_ADDRESS,
             to: email,
-            subject: "MeFieConnect Account",
+            subject: "MeFie Connect Account",
             html: landlordSignupMessage
         });
 
@@ -46,6 +46,7 @@ export const signupLandlord = async (req, res) => {
             email,
             password: hashedPassword,
             phoneNumber,
+            role
         });
 
         await landlord.save();

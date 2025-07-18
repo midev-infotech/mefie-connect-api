@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+import { model, Schema} from "mongoose";
 import normalize from "normalize-mongoose";
 
-const propertySchema = new Schema({
+const requestSchema = new Schema({
     landlordId: {
         type: Schema.Types.ObjectId,
         ref: 'Landlord',
@@ -73,10 +73,6 @@ const propertySchema = new Schema({
     availableDate: {
         type: String,
     },
-    status: {
-        type: String,
-        default: 'pending'
-    },
     amenities: {
         type: [String],
         default: []
@@ -86,9 +82,8 @@ const propertySchema = new Schema({
         type: [],
         required: true
     },
-    
 });
 
-propertySchema.plugin(normalize);
+requestSchema.plugin(normalize);
 
-export const Property = model('Property', propertySchema);
+export const Request = model('Request', requestSchema);

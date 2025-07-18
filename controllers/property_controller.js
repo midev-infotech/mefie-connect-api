@@ -1,6 +1,9 @@
 import { Favorite } from "../models/favorite_model.js";
 import { Property } from "../models/property_model.js";
 import { propertySchema } from "../utils/validator.js";
+import { Landlord } from "../models/landlord_model.js";
+import { approvedMessage, rejectedMessage } from "../utils/email_html.js";
+import { transport } from "../utils/mailer.js";
 
 export const getLandlordAllProperty = async (req, res) => {
     try {
@@ -78,9 +81,9 @@ export const postProperty = async (req, res) => {
             leaseTerm,
             availableDate
         });
-        
+
         const landlordId = req.user.userId;
-        
+
 
         if (error) {
             return res.status(400).json({ success: false, message: error.details[0].message });
@@ -94,10 +97,10 @@ export const postProperty = async (req, res) => {
         if (amenities === undefined) {
             amenities = [];
         }
-        else if (typeof(amenities) === 'string') {
+        else if (typeof (amenities) === 'string') {
             amenities = [amenities];
         }
-        
+
         if (!req.files || req.files.length <= 0) {
             return res.status(400).json({ success: false, message: 'no images uploaded.' });
         }
@@ -118,9 +121,55 @@ export const postProperty = async (req, res) => {
     }
 }
 
+export const reviewListingRequest = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const { propertyId } = req.params;
+        const { role } = req.user;
+        console.log('role:', role)
+        
+        if (role !== 'admin') {
+            return res.status(401).json({message: 'unauthorized'});
+        }
+
+        const property = await Property.findById(propertyId);
+        if (!property) {
+            return res.status(401).json({ success: false, message: "listing not found" });
+        }
+
+        const landlordId = property.landlordId;
+        const landlord = await Landlord.findById(landlordId);
+        const email = landlord.email;
+
+        if (status === 'rejected') {
+            await Property.findByIdAndUpdate(propertyId, {status: 'rejected'});
+            await transport.sendMail({
+                from: process.env.SENDER_EMAIL_ADDRESS,
+                to: email,
+                subject: "Listing Status",
+                html: rejectedMessage(property.propertyTitle, landlord.firstName)
+            });
+
+            return res.status(200).json({ message: "listing rejected" });
+        }
+
+        await Property.findByIdAndUpdate(propertyId, {status: 'approved'});
+        await transport.sendMail({
+            from: process.env.SENDER_EMAIL_ADDRESS,
+            to: email,
+            subject: "Listing Status",
+            html: approvedMessage(property.propertyTitle, landlord.firstName)
+        });
+
+        return res.status(200).json({ success: false, message: "listing approved" });
+
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
+
 export const updateProperty = async (req, res) => {
     try {
-        console.log('body:', req.body)
         const {
             propertyTitle,
             propertyType,
@@ -170,7 +219,7 @@ export const updateProperty = async (req, res) => {
         }
 
         if (req.user.role === 'renter') {
-            return res.status(401).json({ success: false, message: 'Authourized' });
+            return res.status(401).json({ success: false, message: 'unauthourized' });
         }
 
         const foundProperty = await Property.findById(propertyId);
@@ -187,7 +236,7 @@ export const updateProperty = async (req, res) => {
         if (amenities === undefined) {
             amenities = [];
         }
-        else if (typeof(amenities) === 'string') {
+        else if (typeof (amenities) === 'string') {
             amenities = [amenities];
         }
 
@@ -205,7 +254,7 @@ export const updateProperty = async (req, res) => {
         await Property.findByIdAndUpdate(propertyId, updatedProperty);
         const updated = await Property.findById(propertyId);
 
-        res.status(200).json({ success: true,  property: updated, message: 'property updated' });
+        res.status(200).json({ success: true, property: updated, message: 'property updated' });
 
     } catch (error) {
         return res.status(400).json({ success: false, message: error.message });
@@ -232,7 +281,7 @@ export const deleteProperty = async (req, res) => {
         }
 
         await Property.findByIdAndDelete(propertyId);
-        
+
         res.status(200).json({ success: true, message: 'property deleted' });
 
     } catch (error) {
@@ -250,8 +299,9 @@ export const getAllProperty = async (req, res) => {
 }
 
 export const getPropertyByQuery = async (req, res) => {
+    console.log('role:', req.user)
     try {
-        const { propertyTitle, monthlyPrice, city, propertyType, region, bedrooms, bathrooms } = req.query;
+        const { propertyTitle, monthlyPrice, city, propertyType, region, bedrooms, bathrooms, status } = req.query;
 
         let query = {};
 
@@ -276,6 +326,15 @@ export const getPropertyByQuery = async (req, res) => {
         else if (propertyTitle) {
             query.propertyTitle = propertyTitle;
         }
+        else if (status) {
+            
+            // if (req.user.role !== 'admin') {
+            //     return res.status(400).json({message: 'unauthorized'});
+            // }
+
+            query.status = status;
+        }
+        
 
         const property = await Property.find(query);
         if (property.length <= 0) {
@@ -295,16 +354,16 @@ export const saveFavorite = async (req, res) => {
         const role = req.user.role;
         const renterId = req.user.userId;
         const propertyId = req.params.propertyId;
-    
+
         if (role !== 'renter') {
             return res.status(400).json({ success: false, message: "unauthorized" });
         }
-    
+
         const foundProperty = await Property.findById(propertyId);
         if (!foundProperty) {
             return res.status(401).json({ success: false, message: "property not found" });
         }
-    
+
         const favorite = new Favorite({
             renterId,
             propertyId,
@@ -320,7 +379,7 @@ export const saveFavorite = async (req, res) => {
             availableDate: foundProperty.availableDate,
             images: foundProperty.images,
         });
-    
+
         await favorite.save();
         res.status(201).json({ success: true, message: "favorite saved" });
 
@@ -345,7 +404,7 @@ export const viewAllFavorite = async (req, res) => {
         }
 
         res.status(200).json(allFavorite);
-        
+
     } catch (error) {
         return res.status(400).json({ success: false, message: error.message });
     }
@@ -372,7 +431,7 @@ export const deleteFavorite = async (req, res) => {
         }
 
         await Favorite.findByIdAndDelete(favoriteId);
-        
+
         res.status(200).json({ success: true, message: 'favorite deleted' });
 
     } catch (error) {

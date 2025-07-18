@@ -6,7 +6,8 @@ export const landlordSchema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required().min(8),
     confirmPassword: Joi.string().required().min(8),
-    phoneNumber: Joi.string().required().min(9).max(15)
+    phoneNumber: Joi.string().required().min(9).max(15),
+    role: Joi.string()
 });
 
 export const renterSchema = Joi.object({

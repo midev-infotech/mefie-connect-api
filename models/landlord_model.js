@@ -31,7 +31,8 @@ const landlordSchema = new Schema({
     },
     role: {
         type: String,
-        default: 'landlord'
+        default: 'landlord',
+        enum: ['admin', 'landlord']
     },
     resetCode: String,
     resetValidation: Number,
