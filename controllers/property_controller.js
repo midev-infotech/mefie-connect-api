@@ -153,7 +153,7 @@ export const reviewListingRequest = async (req, res) => {
             return res.status(200).json({ message: "listing rejected" });
         }
 
-        const fullname = `${(landlord.firstName).trim()} ${(landlord.lastName.trim)}`
+        const fullname = `${landlord.firstName} ${landlord.lastName}`
         await Property.findByIdAndUpdate(propertyId, {status: 'approved', landlordFullname: fullname});
         await transport.sendMail({
             from: process.env.SENDER_EMAIL_ADDRESS,
