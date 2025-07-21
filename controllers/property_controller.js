@@ -153,7 +153,8 @@ export const reviewListingRequest = async (req, res) => {
             return res.status(200).json({ message: "listing rejected" });
         }
 
-        await Property.findByIdAndUpdate(propertyId, {status: 'approved'});
+        const fullname = `${(landlord.firstName).trim()} ${(landlord.lastName.trim)}`
+        await Property.findByIdAndUpdate(propertyId, {status: 'approved', landlordFullname: fullname});
         await transport.sendMail({
             from: process.env.SENDER_EMAIL_ADDRESS,
             to: email,
@@ -161,7 +162,7 @@ export const reviewListingRequest = async (req, res) => {
             html: approvedMessage(property.propertyTitle, landlord.firstName)
         });
 
-        return res.status(200).json({ success: false, message: "listing approved" });
+        return res.status(200).json({ success: true, message: "listing approved" });
 
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });

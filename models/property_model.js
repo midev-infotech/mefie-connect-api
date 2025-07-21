@@ -7,6 +7,10 @@ const propertySchema = new Schema({
         ref: 'Landlord',
         required: true
     },
+    landlordFullname: {
+        type: String,
+        default: ""
+    },
     propertyTitle: {
         type: String,
         required: true
