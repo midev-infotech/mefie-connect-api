@@ -406,9 +406,9 @@ export const viewAllFavorite = async (req, res) => {
 
         const allFavorite = await Favorite.find({ renterId });
 
-        // if (allFavorite.length <= 0) {
-        //     return res.status(401).json({ success: false, message: 'no favorite found' });
-        // }
+        if (allFavorite.length <= 0) {
+            // return res.status(401).json({ success: false, message: 'no favorite found' });
+        }
 
         res.status(200).json(allFavorite);
 
