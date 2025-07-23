@@ -367,7 +367,7 @@ export const saveFavorite = async (req, res) => {
         }
 
         const favoriteExist = await Favorite.findById(propertyId);
-        if (!favoriteExist) {
+        if (favoriteExist) {
             return res.status(401).json({ success: false, message: "already favorite" });
         }
 
