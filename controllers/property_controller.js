@@ -94,10 +94,11 @@ export const postProperty = async (req, res) => {
         }
 
         let amenities = req.body.amenities;
+        console.log('Amenities: ',amenities)
         if (amenities === undefined) {
             amenities = [];
         }
-        else if (typeof (amenities) === 'string') {
+        else if (typeof(amenities) === 'string') {
             amenities = [amenities];
         }
 
@@ -363,6 +364,11 @@ export const saveFavorite = async (req, res) => {
         const foundProperty = await Property.findById(propertyId);
         if (!foundProperty) {
             return res.status(401).json({ success: false, message: "property not found" });
+        }
+
+        const favoriteExist = await Favorite.findById(propertyId);
+        if (!favoriteExist) {
+            return res.status(401).json({ success: false, message: "already favorite" });
         }
 
         const favorite = new Favorite({
