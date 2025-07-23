@@ -250,7 +250,8 @@ export const updateProperty = async (req, res) => {
         const updatedProperty = {
             ...value,
             amenities,
-            images
+            images,
+            status: 'pending'
         }
 
         await Property.findByIdAndUpdate(propertyId, updatedProperty);
