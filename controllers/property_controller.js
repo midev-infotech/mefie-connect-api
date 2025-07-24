@@ -11,10 +11,6 @@ export const getLandlordAllProperty = async (req, res) => {
 
         const allProperty = await Property.find({ landlordId: userId });
 
-        if (allProperty.length <= 0) {
-            return res.status(401).json({ success: false, message: 'no property found' });
-        }
-
         res.status(200).json(allProperty);
 
     } catch (error) {
@@ -270,10 +266,11 @@ export const deleteProperty = async (req, res) => {
         const landlordId = req.user.userId;
 
         if (req.user.role === 'renter') {
-            return res.status(401).json({ success: false, message: 'Authourized' });
+            return res.status(401).json({ success: false, message: 'unauthourized' });
         }
 
         const foundProperty = await Property.findById(propertyId);
+
         if (!foundProperty) {
             return res.status(401).json({ success: false, message: "property not found" });
         }
@@ -407,10 +404,6 @@ export const viewAllFavorite = async (req, res) => {
 
         const allFavorite = await Favorite.find({ renterId });
 
-        if (allFavorite.length <= 0) {
-            // return res.status(401).json({ success: false, message: 'no favorite found' });
-        }
-
         res.status(200).json(allFavorite);
 
     } catch (error) {
@@ -426,9 +419,9 @@ export const deleteFavorite = async (req, res) => {
         if (req.user.role !== 'renter') {
             return res.status(401).json({ success: false, message: 'unauthourized' });
         }
-        console.log('favid:', favoriteId)
+        
         const foundFavorite = await Favorite.findById(favoriteId);
-        console.log('fav:', foundFavorite)
+        
         if (!foundFavorite) {
             return res.status(400).json({ success: false, message: "favorite not found" });
         }
